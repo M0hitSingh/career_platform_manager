@@ -18,11 +18,24 @@ npm install
 npm run dev
 ```
 
-Visit https://delightful-beignet-b64a48.netlify.app/
+Deployed On AWS : http://3.110.117.51 
 
-### Docker (Quick)
+### Production Build
 ```bash
-docker-compose -f docker-compose.yml up
+# Build for production deployment
+./build-prod.sh        # Linux/Mac
+# or
+build-prod.bat         # Windows
+
+# Or manually:
+cd client
+cp .env.production .env.local
+npm run build
+```
+
+### Docker
+```bash
+docker-compose up
 ```
 ## Imporvement Plan
 - Add quick page which already have basic career page components
