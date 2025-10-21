@@ -93,9 +93,9 @@ docker-compose -f docker-compose.yml up
 Test suite with Jest (models working, API routes need implementation):
 ```bash
 cd server
-npm test tests/models.test.js  # Run model tests (working)
-npm run test:coverage          # Run with coverage report
-npm run test:watch             # Run in watch mode
+npm test tests/models.test.js 
+npm run test:coverage          
+npm run test:watch             
 ```
 
 ### End-to-End Tests
@@ -105,12 +105,3 @@ pip install selenium
 python test_automation_simple.py
 ```
 
-### Test Coverage
-- ✅ Database model validation (working)
-- 🚧 Authentication and authorization (tests ready, routes needed)
-- 🚧 CRUD operations for jobs and companies (tests ready, routes needed)
-- 🚧 Career page builder functionality (tests ready, routes needed)
-- 🚧 Public API endpoints (tests ready, routes needed)
-- 🚧 Middleware and error handling (tests ready, routes needed)
-
-**Note**: The test infrastructure is complete with comprehensive test cases, but the actual API route handlers need to be implemented to make all tests pass.
