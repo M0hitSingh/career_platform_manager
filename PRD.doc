@@ -1,0 +1,122 @@
+Project: ATS Careers Platform (V1.0)
+Target Users: Recruiter (Content Editor) and Candidate (Public Consumer) Goal: Deliver a performant, mobile-first, and SEO-ready Careers Page application that allows our ATS clients (Recruiters) to easily brand and manage their public job listings (Candidates). Architectural Foundation: Hybrid Rendering Strategy (Next.js App Router)
+
+I. User Stories and Goals
+A. Recruiter (Editor) Goals
+The Recruiter needs an intuitive, protected interface to manage their company's presence.
+
+Role	User Story	Justification
+Recruiter	As a Recruiter, I can access a protected URL (/company-slug/edit) to customize my company's careers page without affecting other tenants.	Multi-tenancy and security.
+Recruiter	As a Recruiter, I can set my company's theme colors, upload a logo, and upload a banner image to instantly brand the public page.	Branded experience, core requirement.
+Recruiter	As a Recruiter, I can add, remove, and use drag-and-drop to reorder content sections (e.g., About Us, Life at Company, Video) to control the narrative flow.	Dynamic Content Management, core requirement.
+Recruiter	As a Recruiter, I can view my changes in a real-time preview environment before making them live.	Draft/Publish workflow.
+Recruiter	As a Recruiter, I can confidently publish my draft changes to the live Candidate-facing page.	Final deployment step.
+
+Export to Sheets
+
+B. Candidate (Public) Goals
+The Candidate needs a fast, accessible, and comprehensive experience to find open roles.
+
+Role	User Story	Justification
+Candidate	As a Candidate, I can access the careers page (/<company-slug>/careers) and have the content load instantly, especially on mobile devices.	Performance and Mobile-First requirement.
+Candidate	As a Candidate, I can browse a list of open jobs and easily filter them by Location and Job Type, and search by Job Title.	Core job discovery functionality.
+Candidate	As a Candidate, the entire page must be accessible, ensuring all interactive elements are clearly labeled and keyboard-operable.	Accessibility (A11y) compliance.
+Candidate	As a Candidate, when searching for jobs on Google, I want to see rich results (e.g., the posting date, salary details) directly in the search results.	SEO Readiness (Structured Data).
+
+Export to Sheets
+
+II. Feature Breakdown and Technical Implementation Detail
+1. Architectural Setup (Hybrid Rendering)
+The application must be split into two distinct rendering modes to optimize performance and security:
+
+Component / Route	Rendering Mode	Rationale	Technical Implementation Note
+Recruiter Editor (/edit)	Client-Side Rendering (CSR)	
+Requires heavy interactivity and client-side state management for drag-and-drop editing.   
+
+Use React Client Components (with 'use client' directive).   
+
+Candidate View (/careers)	Server-Side Rendering (SSR)	
+Essential for optimal SEO, fast Time to First Byte (TTFB), and mobile performance.   
+
+Use React Server Components by default. Data fetching happens on the server before HTML is sent.   
+
+2. Data Model and Multi-Tenancy
+The database model must enforce data isolation for each company (tenant). The Shared Database, Shared Schema model is adopted, using a company_fk on all tenant-specific tables.   
+
+Table	Purpose	Key Fields (Minimum)	Multi-Tenancy Strategy
+Company	Tenant details and global branding	id (PK), slug (Unique, e.g., 'acme-corp'), primary_color_hex, logo_url, banner_url	Primary lookup table.
+CompanyConfig	Stores the careers page content	id (PK), company_fk (FK to Company.id), status (Enum: DRAFT/PUBLISHED), content_json (JSONB/Text)	Data isolated by company_fk.
+JobPosting	Live job data (from ATS feed)	id (PK), company_fk (FK to Company.id), title, location, type, description_html, date_posted, valid_through	Data isolated by company_fk.
+
+Export to Sheets
+
+Crucial Content Model: The CompanyConfig.content_json field must store the page structure as an ordered array of objects, where each object represents a customizable content block (e.g., {"type": "video", "url": "..."}). The DND editor modifies this array.   
+
+3. Recruiter Editor Implementation
+Branding (Theming): When the Candidate page is rendered on the server, the primary_color_hex and secondary_color_hex from the Company record must be injected into the root HTML element as CSS variables (e.g., --brand-primary). All components must use these variables for styling to ensure instant theming.   
+
+Content Reordering: Implement Drag-and-Drop functionality to allow Recruiters to reorder sections. Use a modern, flexible React DND library such as dnd-kit to handle the component list reordering. The DND interaction must feel smooth (Content Drag-Drop pattern) and manipulate the order of items within the content_json array.   
+
+Preview and Publish:
+
+Draft State: All changes made by the Recruiter must be saved to the DRAFT record of CompanyConfig.   
+
+Preview Route: The preview URL (/company-slug/preview) must explicitly query for and render the DRAFT content, allowing Recruiters to check their work without impacting the live site.   
+
+Publish Action: The Publish button executes a server action that copies the data from the DRAFT state to the PUBLISHED state.
+
+4. Candidate View Implementation (Performance, SEO, A11y)
+Job Filtering and Search:
+
+The list of all open jobs for the tenant should be fetched via SSR and passed to the client.
+
+Filtering by Location and Job Type, and searching by Job Title, must be implemented client-side against this pre-loaded dataset.   
+
+Performance Requirement: Implement a debouncing utility (recommended delay: 300ms) on the Job Title search input to prevent excessive computation on every keystroke, ensuring smooth performance, especially on mobile.   
+
+SEO (Structured Data):
+
+Dynamic Meta Tags: On the job detail page, use the Next.js generateMetadata function (a Server Component feature) to fetch job data and dynamically inject the <title>, <meta name="description">, and Open Graph tags (for social sharing).   
+
+JobPosting Schema: The job detail page must include Schema.org JobPosting structured data, dynamically generated from the job data, and placed in a <script type="application/ld+json"> tag.   
+
+Security Note for JSON-LD: When inserting the JSON-LD using dangerouslySetInnerHTML, the output of JSON.stringify() must be sanitized to mitigate XSS by replacing the < character with its Unicode equivalent, \u003c.   
+
+Accessibility (A11y): The interface must meet WCAG 2.1 Level AA standards.   
+
+Keyboard Operability: All filter controls (inputs, dropdowns) must be fully navigable and operable using only the keyboard (Tab key, Arrow keys, Enter/Spacebar).   
+
+Labeling and Contrast: Every filter input requires a clear, programmatic label. All text and non-text interactive elements must maintain a minimum contrast ratio of 4.5:1.   
+
+Mobile-First Design: The application must be designed and implemented with mobile CSS breakpoints prioritized. Complex filter controls should collapse into a simplified, touch-friendly interface with generously sized touch targets.   
+
+III. Acceptance Criteria (Definition of Done)
+The feature is considered complete when all of the following criteria are met:
+
+Code/Deployment: GitHub repository is complete, working code is deployed to a live link, and a comprehensive Tech Spec.md is provided.
+
+Recruiter Functionality:
+
+Recruiters can successfully log in and access their unique /edit page.
+
+Brand colors and assets are saved and accurately reflected on the public page.
+
+Content sections can be added, deleted, and reordered via drag-and-drop, and the resulting JSON array is successfully saved to the DRAFT configuration.
+
+The /preview route accurately displays the DRAFT content.
+
+The Publish action successfully updates the PUBLISHED configuration used by the Candidate view.
+
+Candidate Functionality:
+
+The public careers page loads quickly (fast FCP on mobile) and is fully responsive across mobile and desktop devices.
+
+Job listings are correctly loaded and filtered by Location, Job Type, and Job Title.
+
+Searching by Job Title is debounced (e.g., 300ms delay) and remains performant on mobile.
+
+Compliance:
+
+The public pages are accessible (A11y), passing keyboard operability tests for all controls.   
+
+Google’s Rich Results Test validates that the JobPosting structured data is present and correctly formatted on job detail pages.

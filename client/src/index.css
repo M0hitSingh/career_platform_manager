@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+/* Prevent horizontal overflow and double scrollbars */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw;
+}
+
+#root {
+  max-width: 100vw;
+  overflow-x: hidden !important;
+}
+
+/* Apply overflow-x hidden globally to prevent any horizontal scrolling */
+* {
+  max-width: 100vw;
+}
+
+.career-page,
+.preview-modal {
+  overflow-x: hidden;
+}
+
+/* Page builder specific fixes - only apply in preview contexts */
+.preview-modal .component-wrapper,
+.career-page .component-wrapper {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.job-section .w-full {
+  max-width: 100%;
+}
+
+.job-section .max-w-6xl {
+  max-width: min(72rem, calc(100vw - 3rem));
+}
+
+/* Ensure components respect container padding - only in preview */
+.preview-modal .component-wrapper > div,
+.career-page .component-wrapper > div {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Fix ImageBox overflow in editor */
+.image-box {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.image-box .w-full {
+  max-width: 100%;
+}
+
+.image-box .max-w-6xl,
+.image-box .max-w-4xl,
+.image-box .max-w-2xl {
+  max-width: 100%;
+}
+
+/* Ensure grid doesn't overflow */
+.image-box .grid {
+  max-width: 100%;
+}
+
+/* Aggressive overflow prevention for page builder */
+.flex, .grid, .w-full, .max-w-6xl, .max-w-4xl, .max-w-2xl {
+  max-width: 100vw !important;
+}
+
+/* Prevent any component from causing horizontal scroll */
+.component-wrapper,
+.component-wrapper * {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Page builder canvas specific fixes */
+.flex.h-full.flex-col,
+.flex-1.overflow-auto {
+  /* overflow-x removed to allow proper scrolling */
+}
+
+/* Mobile-specific improvements for job filters */
+@media (max-width: 640px) {
+  .job-section .grid {
+    gap: 0.75rem;
+  }
+  
+  .job-section select,
+  .job-section input {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+  
+  .job-section .bg-gray-50 {
+    padding: 1rem;
+    border-radius: 0.5rem;
+  }
+}
