@@ -18,7 +18,7 @@ npm install
 npm run dev
 ```
 
-Visit http://localhost:5000
+Visit https://delightful-beignet-b64a48.netlify.app/
 
 ### Docker (Quick)
 ```bash
